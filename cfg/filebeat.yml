@@ -149,7 +149,7 @@ setup.template.settings:
 # ---------------------------- Elasticsearch Output ----------------------------
 #output.elasticsearch:
   # Array of hosts to connect to.
-  # hosts: ["192.168.0.26:9200"]
+  # hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
