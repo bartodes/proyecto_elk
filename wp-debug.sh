@@ -6,7 +6,7 @@ WP_CONFIG_PATH="/var/www/html/wordpres/wp-config.php"
 
 function setUpConfig() {
     #----DEBUG ENABLED----#
-    sudo dd if=./cfg/wp-config.php of=${WP_CONFIG_PATH}
+    sudo dd if=cfg/wp-config.php of=$WP_CONFIG_PATH
     echo -e '\n *DEBUG ENABLED*\n'
 }
 
