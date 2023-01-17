@@ -1,10 +1,12 @@
-Como proyecto hice aquí una automatización de la instalación, la configuración y el despliegue de servicios como ELK, Filebeat, Nginx, Mysql y Wordpress.
+Como proyecto hice aquí una automatización de la instalación, la configuración y el despliegue de servicios como ELK, Filebeat, Nginx, Mysql y Wordpress. Fue testeado en entornos deb (Debian y Ubuntu).
 
-*Estos scripts utilizan sudo para ciertos comandos*
+*Supported distros: Debian based.*
+
+*Estos scripts utilizan sudo para ciertos comandos.*
 
 Los pasos a seguir son sencillos:
 
-1- Clonamos el repositorio y accedemos a el directorio 
+1- Clonamos el repositorio y accedemos a el directorio. 
 2- Ejecutamos web-deploy.sh en una maquina virtual (debemos recordar la ip de esta misma).
 3- Ejecutamos elk-deploy.sh en otra maquina virtual (debemos recordar la ip de esta misma).
 4- Una vez desplegado el sitio en Wordpress accedemos con las credenciales dadas luego, nos creamos un usuario, procedemos con la instalación y accedemos a nuestro sitio.
