@@ -3,21 +3,21 @@
 #For installation
 PHP_MODULES='php php8.1 php8.1-fpm php8.1-gd php8.1-curl php8.1-http php8.1-xml php8.1-bcmath php8.1-mysql'
 ELK_GPG="https://artifacts.elastic.co/GPG-KEY-elasticsearch"
-ELK_REPO="deb [signed-by=/etc/apt/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main"
+ELK_REPO="deb https://artifacts.elastic.co/packages/7.x/apt stable main"
 
 #For Config
 DB_MYSQL="wp_mysite"
 DB_USER="wp_mysite_user"
 DB_PSSWD="passwd"
 NGINX_VH_PATH="/etc/nginx/sites-available/mysite"
-FB_PATH="/etc/filebeat"
+FB_CFG_PATH="/etc/filebeat/filebeat.yml"
 FB_MODULES_PATH="/etc/filebeat/modules.d"
+WP_PATH="/var/www/html/wordpress"
 
 
 function printCredentials() {
     echo -e "\n ###DATA BASE CREDENTIALS###\n"
     echo -e "   Data base:	$DB_MYSQL\n   DB User:	$DB_USER\n   DB password:	$DB_PSSWD\n"
-    exit
 }
 
 
@@ -41,10 +41,13 @@ function setUpConfig() {
         echo "127.0.0.1 mysite.com" | sudo tee -a /etc/hosts 
     fi 
     
-    sudo nginx -s reload
-
+    echo -e '\n#----Firewall----'
+    
+    sudo ufw allow 'Nginx Full'
+    
     echo -e '\n#----Services----'
 
+    sudo nginx -s reload
     sudo systemctl enable nginx.service
     sudo systemctl daemon-reload
     sudo systemctl reload nginx.service
@@ -57,20 +60,23 @@ function setUpConfig() {
 
     echo -e '\n#----Config Files----'
     
+
     sudo dd if=cfg/nginx.yml of=$FB_MODULES_PATH/nginx.yml
     sudo dd if=cfg/mysql.yml of=$FB_MODULES_PATH/mysql.yml
-    sudo dd if=cfg/filebeat.yml of=$FB_PATH/filebeat.yml
+    sudo dd if=cfg/filebeat.yml of=$FB_CFG_PATH/filebeat.yml
 
     echo -e '\n#----Services----'
     sudo systemctl enable filebeat
     sudo systemctl daemon-reload
     sudo systemctl start filebeat
+    sudo systemctl restart filebeat
 
     
-    echo -e '\n ### INFO ### \n'
+    echo -e '\n # --> INFO'
     echo ' # output.elasticsearch is disabled'
     echo ' # output.kibana is disabled'
-    echo ' # output.logstash hosts is set to:   "localhost:5044" '
+    echo ' # output.logstash hosts is set to:  ["localhost:5044"]'
+    echo ' # NOTE: You have to manually change this setting for Filebeat to send logs to Logstash.'
     echo -e '\n *** This configurations are set in ---> filebeat.yml ***\n'
 }
 
@@ -81,11 +87,15 @@ function installPackages() {
     sudo apt-get install -y wget nginx mysql-server mysql-client
     sudo apt-get install -y $PHP_MODULES
   
-    wget https://wordpress.org/latest.tar.gz
-    tar xzfv latest.tar.gz 1>/dev/null
-    sudo mv wordpress/ /var/www/html/wordpress
+    if [ ! -e $WP_PATH ]; then
+        wget https://wordpress.org/latest.tar.gz
+        tar xzfv latest.tar.gz 1>/dev/null
+        sudo mv wordpress/ $WP_PATH
+    else
+        echo "[info]: Wordpress is in $WP_PATH"
+    fi
 
-    wget -qO - $ELK_GPG | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-keyring.gpg 
+    wget -qO - $ELK_GPG | sudo apt-key add
     echo $ELK_REPO | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
     sudo apt-get update && sudo apt-get install -y filebeat
 }
@@ -98,12 +108,11 @@ function main() {
 }
 main
 
-echo -e '\n# --> Mysql'
-echo '#----DB & USER----'
+# --> Mysql
+#----DB & USER----
 
 sudo mysql <<EOFMYSQL
-drop database $DB_MYSQL;
-create database $DB_MYSQL;
+create database IF NOT EXISTS $DB_MYSQL;
 create user IF NOT EXISTS $DB_USER identified by "$DB_PSSWD";
 grant all privileges on $DB_MYSQL.* to $DB_USER;
 flush privileges;

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-WP_PATH="/var/www/html/wordpres"
-WP_CONFIG_PATH="/var/www/html/wordpres/wp-config.php"
+WP_PATH="/var/www/html/wordpress"
+WP_CONFIG_PATH="/var/www/html/wordpress/wp-config.php"
 
 
 function setUpConfig() {
