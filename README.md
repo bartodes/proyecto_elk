@@ -1,4 +1,4 @@
-Como proyecto hice aquí una automatización de la instalación, la configuración y el despliegue de servicios como ELK, Filebeat, Nginx, Mysql y Wordpress. Fue testeado en entornos deb (Debian y Ubuntu).
+Automatización de la instalación, la configuración y el despliegue de servicios como ELK, Filebeat, Nginx, Mysql y Wordpress. Fue testeado en entornos deb (Debian y Ubuntu).
 
 *Supported distros: Debian based.*
 
